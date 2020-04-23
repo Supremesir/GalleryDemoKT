@@ -1,8 +1,6 @@
 package com.supremesir.gallerydemokt
 
 import android.app.Application
-import android.app.DownloadManager
-import android.content.ClipData
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
