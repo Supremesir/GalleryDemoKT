@@ -37,7 +37,7 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
         val holder = MyViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.gallery_cell, parent, false)
         )
-        holder.itemView.setOnClickListener {  }
+        holder.itemView.setOnClickListener { }
         return holder
     }
 
@@ -68,7 +68,6 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
-
                     return false.also {
                         // 加入 ?. 判空，
                         holder.itemView.shimmerLayoutCell?.stopShimmerAnimation()
@@ -82,6 +81,4 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
 
 }
 
-class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-}
+class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
