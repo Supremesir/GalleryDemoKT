@@ -6,7 +6,7 @@
     android:layout_margin="4dp">
 
     <io.supercharge.shimmerlayout.ShimmerLayout
-        android:id="@+id/shimmerLayoutGallery"
+        android:id="@+id/shimmerLayoutCell"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
