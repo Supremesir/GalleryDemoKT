@@ -32,13 +32,20 @@ class GalleryFragment : Fragment() {
             adapter = galleryAdapter
             layoutManager = GridLayoutManager(requireContext(), 2)
         }
+
         val galleryViewModel =
             ViewModelProvider(requireActivity()).get(GalleryViewModel::class.java)
         galleryViewModel.photoListLive.observe(requireActivity(), Observer {
-            Log.d("fetch","请求重新获取数据")
+            Log.d("fetch","LiveData 更新成功")
+            swipeRefreshLayoutGallery.isRefreshing = false
             galleryAdapter.submitList(it)
         })
         galleryViewModel.photoListLive.value ?: galleryViewModel.fetchData()
+
+        swipeRefreshLayoutGallery.setOnRefreshListener {
+            Log.d("fetch","下拉刷新，重新请求数据")
+            galleryViewModel.fetchData()
+        }
     }
 
 }
