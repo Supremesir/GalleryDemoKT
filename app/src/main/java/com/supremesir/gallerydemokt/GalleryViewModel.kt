@@ -28,17 +28,22 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
             getUrl(),
             Response.Listener {
                 _photoListLive.value = Gson().fromJson(it, Pixabay::class.java).hits.toList()
+                Log.d("fetch", "请求成功")
             },
             Response.ErrorListener {
-                Log.d("error", it.toString())
+                Log.d("fetch", "请求失败，$it")
             }
-        ).also {
-            VolleySingleton.getInstance(getApplication()).requestQueue.add(it)
-        }
+        )
+//            .also {
+//            VolleySingleton.getInstance(getApplication()).requestQueue.add(it)
+//        }
+        VolleySingleton.getInstance(getApplication()).requestQueue.add(stringRequest)
     }
 
     private fun getUrl(): String {
-        return "https://pixabay.com/api/?key=16144591-adae3cf7f07751722a20825cf&q=${keyWords.random()}"
+        val url = "https://pixabay.com/api/?key=16144591-adae3cf7f07751722a20825cf&q=${keyWords.random()}"
+        Log.d("fetch", url)
+        return url
     }
 
     private val keyWords = arrayOf("cat", "dog", "car", "bee", "phone", "flower", "animal")
