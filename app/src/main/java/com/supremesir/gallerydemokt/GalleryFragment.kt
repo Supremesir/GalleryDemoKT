@@ -2,10 +2,8 @@ package com.supremesir.gallerydemokt
 
 import android.os.Bundle
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
@@ -27,6 +25,7 @@ class GalleryFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        setHasOptionsMenu(true)
         val galleryAdapter = GalleryAdapter()
         recycleView.apply {
             adapter = galleryAdapter
@@ -46,6 +45,12 @@ class GalleryFragment : Fragment() {
             Log.d("fetch","下拉刷新，重新请求数据")
             galleryViewModel.fetchData()
         }
+    }
+
+    // 加载 Menu 资源
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu, menu)
     }
 
 }
