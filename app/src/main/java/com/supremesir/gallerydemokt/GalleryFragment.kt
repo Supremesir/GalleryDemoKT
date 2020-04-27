@@ -1,6 +1,7 @@
 package com.supremesir.gallerydemokt
 
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -14,6 +15,8 @@ import kotlinx.android.synthetic.main.fragment_gallery.*
  * A simple [Fragment] subclass.
  */
 class GalleryFragment : Fragment() {
+
+    private lateinit var galleryViewModel: GalleryViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +35,7 @@ class GalleryFragment : Fragment() {
             layoutManager = GridLayoutManager(requireContext(), 2)
         }
 
-        val galleryViewModel =
+        galleryViewModel =
             ViewModelProvider(requireActivity()).get(GalleryViewModel::class.java)
         galleryViewModel.photoListLive.observe(requireActivity(), Observer {
             Log.d("fetch","LiveData 更新成功")
@@ -51,6 +54,19 @@ class GalleryFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu, menu)
+    }
+
+    // 实现 Menu Item 点击事件
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.refresh -> {
+                swipeRefreshLayoutGallery.isRefreshing = true
+                // 为请求数据延时1s，保证转动效果的出现
+                Handler().postDelayed(Runnable { galleryViewModel.fetchData() }, 1000)
+
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 }
