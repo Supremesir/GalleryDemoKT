@@ -1,9 +1,11 @@
 package com.supremesir.gallerydemokt
 
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,7 +39,12 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
         val holder = MyViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.gallery_cell, parent, false)
         )
-        holder.itemView.setOnClickListener { }
+        holder.itemView.setOnClickListener {
+            Bundle().apply {
+                putParcelable("LARGE_IMAGE" ,getItem(holder.adapterPosition))
+                holder.itemView.findNavController().navigate(R.id.action_galleryFragment_to_photoFragment, this)
+            }
+        }
         return holder
     }
 

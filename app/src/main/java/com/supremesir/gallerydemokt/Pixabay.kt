@@ -1,6 +1,8 @@
 package com.supremesir.gallerydemokt
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
 /**
  * @author HaoFan Fang
@@ -33,9 +35,9 @@ data class Pixabay(
     }
 }
 
-data class PhotoItem(
+@Parcelize data class PhotoItem(
     // 使用 SerializedName 规范化命名
     @SerializedName("id") val photoId: Int,
     @SerializedName("largeImageURL") val fullUrl: String,
     @SerializedName("webformatURL") val previewUrl: String
-)
+): Parcelable
