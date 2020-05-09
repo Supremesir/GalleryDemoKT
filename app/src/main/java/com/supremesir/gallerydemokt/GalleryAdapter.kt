@@ -41,8 +41,10 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
         )
         holder.itemView.setOnClickListener {
             Bundle().apply {
-                putParcelable("LARGE_IMAGE" ,getItem(holder.adapterPosition))
-                holder.itemView.findNavController().navigate(R.id.action_galleryFragment_to_photoFragment, this)
+                putParcelableArrayList("PHOTO_LIST", ArrayList(currentList))
+                putInt("PHOTO_POSITION", holder.adapterPosition)
+                // 此处的 this 代表该 Bundle
+                holder.itemView.findNavController().navigate(R.id.action_galleryFragment_to_pagerPhotoFragment, this)
             }
         }
         return holder
