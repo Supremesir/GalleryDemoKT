@@ -9,7 +9,8 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@android:color/background_dark" />
 
     <TextView
         android:id="@+id/photoTag"
@@ -17,6 +18,7 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
         android:gravity="bottom|center_horizontal"
-        android:text="@string/hello_blank_fragment" />
+        android:text="@string/hello_blank_fragment"
+        android:textColor="@android:color/background_light" />
 
 </FrameLayout>
