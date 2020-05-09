@@ -22,9 +22,9 @@ import kotlinx.android.synthetic.main.gallery_cell.view.*
  * @date 2020/4/23 21:54
  */
 
-class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DIFFCALLBACK) {
+class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
 
-    object DIFFCALLBACK : DiffUtil.ItemCallback<PhotoItem>() {
+    object DiffCallback : DiffUtil.ItemCallback<PhotoItem>() {
         override fun areItemsTheSame(oldItem: PhotoItem, newItem: PhotoItem): Boolean {
             // === 表示判断是否是同一个对象
             return oldItem === newItem
