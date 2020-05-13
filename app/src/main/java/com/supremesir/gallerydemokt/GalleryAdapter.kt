@@ -51,10 +51,16 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.itemView.shimmerLayoutCell.apply {
-            setShimmerColor(0x55FFFFFF)
-            setShimmerAngle(0)
-            startShimmerAnimation()
+        val photoItem = getItem(position)
+        with(holder.itemView) {
+            shimmerLayoutCell.apply {
+                setShimmerColor(0x55FFFFFF)
+                setShimmerAngle(0)
+                startShimmerAnimation()
+            }
+            textViewUser.text = photoItem.photoUser
+            textViewLikes.text = photoItem.photoLikes.toString()
+            textViewFavorites.text = photoItem.photoFavorites.toString()
         }
         Glide.with(holder.itemView)
             .load(getItem(position).previewUrl)
