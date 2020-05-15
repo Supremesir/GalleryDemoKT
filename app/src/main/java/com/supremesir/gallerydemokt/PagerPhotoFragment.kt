@@ -52,7 +52,7 @@ class PagerPhotoFragment : Fragment() {
 //        }
 
         saveButton.setOnClickListener {
-            if (Build.VERSION.SDK_INT < 29 && ContextCompat.checkSelfPermission(
+            if (ContextCompat.checkSelfPermission(
                     requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
