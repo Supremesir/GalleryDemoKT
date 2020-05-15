@@ -15,10 +15,15 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.get
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.android.synthetic.main.fragment_pager_photo.*
 import kotlinx.android.synthetic.main.pager_photo_view.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * A simple [Fragment] subclass.
@@ -68,7 +73,9 @@ class PagerPhotoFragment : Fragment() {
                     REQUEST_WRITE_EXTERNAL_STORAGE
                 )
             } else {
-                savePhoto()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    savePhoto()
+                }
             }
         }
     }
@@ -82,17 +89,20 @@ class PagerPhotoFragment : Fragment() {
         when (requestCode) {
             REQUEST_WRITE_EXTERNAL_STORAGE ->
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    savePhoto()
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        savePhoto()
+                    }
                 } else {
                     Toast.makeText(requireContext(), "请授权存储权限以保存图片", Toast.LENGTH_SHORT).show()
                 }
         }
     }
 
-    private fun savePhoto() {
-        val holder =
-            (viewPager2[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager2.currentItem) as PagerPhotoViewHolder
-        val bitmap = holder.itemView.pagerPhoto.drawable.toBitmap()
+    private suspend fun savePhoto() {
+        withContext(Dispatchers.IO) {
+            val holder =
+                (viewPager2[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager2.currentItem) as PagerPhotoViewHolder
+            val bitmap = holder.itemView.pagerPhoto.drawable.toBitmap()
 //        // API < 29 时，可用
 //        if (MediaStore.Images.Media.insertImage(
 //                requireActivity().contentResolver,
@@ -105,20 +115,36 @@ class PagerPhotoFragment : Fragment() {
 //        } else {
 //            Toast.makeText(requireContext(), "存储成功", Toast.LENGTH_SHORT).show()
 //        }
-        val saveUri = requireContext().contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            ContentValues()
-        )?: kotlin.run {
-            Toast.makeText(requireContext(), "存储失败", Toast.LENGTH_SHORT).show()
-            return
-        }
+            val saveUri = requireContext().contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                ContentValues()
+            ) ?: kotlin.run {
+                // Toast 是UI上的操作，必须在主线程上进行
+                MainScope().launch {
+                    Toast.makeText(requireContext(), "存储失败", Toast.LENGTH_SHORT).show()
+                }
+                return@withContext
+            }
 
-        requireContext().contentResolver.openOutputStream(saveUri).use {
-            // 压缩存储大文件耗费很长时间，需要放在工作线程里
-            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)) {
-                Toast.makeText(requireContext(), "存储成功", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(requireContext(), "存储失败", Toast.LENGTH_SHORT).show()
+            requireContext().contentResolver.openOutputStream(saveUri).use {
+                // 压缩存储大文件耗费很长时间，需要放在工作线程里
+                if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)) {
+                    MainScope().launch {
+                        Toast.makeText(
+                            requireContext(),
+                            "存储成功",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    MainScope().launch {
+                        Toast.makeText(
+                            requireContext(),
+                            "存储失败",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
         }
     }
