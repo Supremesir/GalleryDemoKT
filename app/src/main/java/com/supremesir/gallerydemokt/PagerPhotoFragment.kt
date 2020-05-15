@@ -115,10 +115,11 @@ class PagerPhotoFragment : Fragment() {
 
         requireContext().contentResolver.openOutputStream(saveUri).use {
             // 压缩存储大文件耗费很长时间，需要放在工作线程里
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)) {
+                Toast.makeText(requireContext(), "存储成功", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "存储失败", Toast.LENGTH_SHORT).show()
+            }
         }
-
-
-        Toast.makeText(requireContext(), "存储成功", Toast.LENGTH_SHORT).show()
     }
 }
