@@ -4,14 +4,19 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.get
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.android.synthetic.main.fragment_pager_photo.*
+import kotlinx.android.synthetic.main.pager_photo_view.view.*
 
 /**
  * A simple [Fragment] subclass.
@@ -77,12 +82,29 @@ class PagerPhotoFragment : Fragment() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     savePhoto()
                 } else {
-                    Toast.makeText(requireContext(),"请授权存储权限以保存图片", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "请授权存储权限以保存图片", Toast.LENGTH_SHORT).show()
                 }
         }
     }
 
     private fun savePhoto() {
-        TODO("Not yet implemented")
+        val holder =
+            (viewPager2[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager2.currentItem) as PagerPhotoViewHolder
+        val bitmap = holder.itemView.pagerPhoto.drawable.toBitmap()
+        // API < 29 时，可用
+        if (MediaStore.Images.Media.insertImage(
+                requireActivity().contentResolver,
+                bitmap,
+                "",
+                ""
+            ) == null
+        ) {
+            Toast.makeText(requireContext(), "存储失败", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(requireContext(), "存储成功", Toast.LENGTH_SHORT).show()
+        }
+
+
+        Toast.makeText(requireContext(), "存储成功", Toast.LENGTH_SHORT).show()
     }
 }
