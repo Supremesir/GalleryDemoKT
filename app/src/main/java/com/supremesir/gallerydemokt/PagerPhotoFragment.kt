@@ -1,7 +1,9 @@
 package com.supremesir.gallerydemokt
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -91,17 +93,29 @@ class PagerPhotoFragment : Fragment() {
         val holder =
             (viewPager2[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager2.currentItem) as PagerPhotoViewHolder
         val bitmap = holder.itemView.pagerPhoto.drawable.toBitmap()
-        // API < 29 时，可用
-        if (MediaStore.Images.Media.insertImage(
-                requireActivity().contentResolver,
-                bitmap,
-                "",
-                ""
-            ) == null
-        ) {
+//        // API < 29 时，可用
+//        if (MediaStore.Images.Media.insertImage(
+//                requireActivity().contentResolver,
+//                bitmap,
+//                "",
+//                ""
+//            ) == null
+//        ) {
+//            Toast.makeText(requireContext(), "存储失败", Toast.LENGTH_SHORT).show()
+//        } else {
+//            Toast.makeText(requireContext(), "存储成功", Toast.LENGTH_SHORT).show()
+//        }
+        val saveUri = requireContext().contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            ContentValues()
+        )?: kotlin.run {
             Toast.makeText(requireContext(), "存储失败", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(requireContext(), "存储成功", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        requireContext().contentResolver.openOutputStream(saveUri).use {
+            // 压缩存储大文件耗费很长时间，需要放在工作线程里
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
         }
 
 
