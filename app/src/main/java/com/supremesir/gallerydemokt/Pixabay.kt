@@ -42,5 +42,7 @@ data class Pixabay(
     @SerializedName("webformatURL") val previewUrl: String,
     @SerializedName("user") val photoUser: String,
     @SerializedName("likes") val photoLikes: Int,
-    @SerializedName("favorites") val photoFavorites: Int
+    @SerializedName("favorites") val photoFavorites: Int,
+    @SerializedName("imageWidth") val photoWidth: Int,
+    @SerializedName("imageHeight") val photoHeight: Int
 ): Parcelable

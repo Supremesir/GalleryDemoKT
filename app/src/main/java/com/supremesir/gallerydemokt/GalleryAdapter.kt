@@ -24,6 +24,11 @@ import kotlinx.android.synthetic.main.gallery_cell.view.*
  */
 
 class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
+
+    // 使用 拙劣的 方式存储并传递 图片 高和宽
+    var photoHeight: Int = 0
+    var photoWidth: Int = 0
+
     // 创建一个属于类的常量
     companion object {
         const val NORMAL_VIEW_TYPE = 0
@@ -60,6 +65,7 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
                 Bundle().apply {
                     putParcelableArrayList("PHOTO_LIST", ArrayList(currentList))
                     putInt("PHOTO_POSITION", holder.adapterPosition)
+                    putIntArray("PHOTO_SIZE", intArrayOf(photoHeight, photoWidth))
                     // 此处的 this 代表该 Bundle
                     holder.itemView.findNavController()
                         .navigate(R.id.action_galleryFragment_to_pagerPhotoFragment, this)
@@ -78,6 +84,7 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+
         if (position == itemCount - 1) {
             return
         }
@@ -91,6 +98,8 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
             textViewUser.text = photoItem.photoUser
             textViewLikes.text = photoItem.photoLikes.toString()
             textViewFavorites.text = photoItem.photoFavorites.toString()
+            photoHeight = photoItem.photoHeight
+            photoWidth = photoItem.photoWidth
         }
         Glide.with(holder.itemView)
             .load(getItem(position).previewUrl)

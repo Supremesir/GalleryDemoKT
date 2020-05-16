@@ -101,9 +101,19 @@ class PagerPhotoFragment : Fragment() {
     // suspend 声明该方法为可中断的
     private suspend fun savePhoto() {
         withContext(Dispatchers.IO) {
+            // 使用拙劣的方式获取传递过来的图片高和宽，并按照其尺寸存储图片
+            val height = arguments?.getIntArray("PHOTO_SIZE")?.get(0)
+            val width = arguments?.getIntArray("PHOTO_SIZE")?.get(1)
             val holder =
                 (viewPager2[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager2.currentItem) as PagerPhotoViewHolder
-            val bitmap = holder.itemView.pagerPhoto.drawable.toBitmap()
+            val bitmap: Bitmap
+            bitmap = if (width != 0 && height != 0) {
+                holder.itemView.pagerPhoto.drawable.toBitmap(width!!, height!!)
+            } else {
+                holder.itemView.pagerPhoto.drawable.toBitmap()
+            }
+
+
 //        // API < 29 时，可用
 //        if (MediaStore.Images.Media.insertImage(
 //                requireActivity().contentResolver,
