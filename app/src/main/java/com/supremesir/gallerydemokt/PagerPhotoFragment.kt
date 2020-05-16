@@ -98,6 +98,7 @@ class PagerPhotoFragment : Fragment() {
         }
     }
 
+    // suspend 声明该方法为可中断的
     private suspend fun savePhoto() {
         withContext(Dispatchers.IO) {
             val holder =
@@ -120,6 +121,7 @@ class PagerPhotoFragment : Fragment() {
                 ContentValues()
             ) ?: kotlin.run {
                 // Toast 是UI上的操作，必须在主线程上进行
+                // 使用 launch 创建一个协程，且不会阻塞当前线程
                 MainScope().launch {
                     Toast.makeText(requireContext(), "存储失败", Toast.LENGTH_SHORT).show()
                 }
