@@ -67,7 +67,7 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
             }
         } else {
             holder = MyViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.gallery_foot, parent, false)
+                LayoutInflater.from(parent.context).inflate(R.layout.gallery_footer, parent, false)
                     .also {
                         // 因为之前是2列的布局，将 footer 调整到居中的位置
                         (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan = true
