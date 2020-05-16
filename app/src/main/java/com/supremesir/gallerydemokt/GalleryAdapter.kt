@@ -9,6 +9,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -23,6 +24,11 @@ import kotlinx.android.synthetic.main.gallery_cell.view.*
  */
 
 class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
+    // 创建一个属于类的常量
+    companion object {
+        const val NORMAL_VIEW_TYPE = 0
+        const val FOOTER_VIEW_TYPE = 1
+    }
 
     object DiffCallback : DiffUtil.ItemCallback<PhotoItem>() {
         override fun areItemsTheSame(oldItem: PhotoItem, newItem: PhotoItem): Boolean {
@@ -35,22 +41,46 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
         }
     }
 
+    override fun getItemId(position: Int): Long {
+        // 因为在底部要添加 footer，所以 +1
+        return super.getItemId(position) + 1
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position == itemCount - 1) FOOTER_VIEW_TYPE else NORMAL_VIEW_TYPE
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val holder = MyViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.gallery_cell, parent, false)
-        )
-        holder.itemView.setOnClickListener {
-            Bundle().apply {
-                putParcelableArrayList("PHOTO_LIST", ArrayList(currentList))
-                putInt("PHOTO_POSITION", holder.adapterPosition)
-                // 此处的 this 代表该 Bundle
-                holder.itemView.findNavController().navigate(R.id.action_galleryFragment_to_pagerPhotoFragment, this)
+        val holder: MyViewHolder
+        if (viewType == NORMAL_VIEW_TYPE) {
+            holder = MyViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.gallery_cell, parent, false)
+            )
+            holder.itemView.setOnClickListener {
+                Bundle().apply {
+                    putParcelableArrayList("PHOTO_LIST", ArrayList(currentList))
+                    putInt("PHOTO_POSITION", holder.adapterPosition)
+                    // 此处的 this 代表该 Bundle
+                    holder.itemView.findNavController()
+                        .navigate(R.id.action_galleryFragment_to_pagerPhotoFragment, this)
+                }
             }
+        } else {
+            holder = MyViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.gallery_foot, parent, false)
+                    .also {
+                        // 因为之前是2列的布局，将 footer 调整到居中的位置
+                        (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan = true
+                    }
+            )
         }
         return holder
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        if (position == itemCount - 1) {
+            return
+        }
         val photoItem = getItem(position)
         with(holder.itemView) {
             shimmerLayoutCell.apply {
@@ -91,7 +121,6 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
 
             })
             .into(holder.itemView.imageView)
-
     }
 
 }
