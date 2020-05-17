@@ -22,6 +22,11 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     val photoListLive: LiveData<List<PhotoItem>>
         get() = _photoListLive
 
+    // TODO: 下拉到底，继续从网站请求数据
+    fun resetQuery() {
+
+    }
+
     // TODO: 根据搜索框接受关键词进行搜索
     fun fetchData() {
         val stringRequest = StringRequest(

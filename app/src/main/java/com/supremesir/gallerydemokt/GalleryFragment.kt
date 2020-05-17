@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.fragment_gallery.*
 
@@ -50,6 +51,20 @@ class GalleryFragment : Fragment() {
             Log.d("fetch","下拉刷新，重新请求数据")
             galleryViewModel.fetchData()
         }
+
+        recycleView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy < 0) return
+                val intArray = IntArray(2)
+                val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
+                layoutManager.findLastVisibleItemPositions(intArray)
+                if (intArray[0] == galleryAdapter.itemCount - 1) {
+
+                }
+
+            }
+        })
     }
 
     // 加载 Menu 资源
@@ -85,5 +100,4 @@ class GalleryFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
-
 }
