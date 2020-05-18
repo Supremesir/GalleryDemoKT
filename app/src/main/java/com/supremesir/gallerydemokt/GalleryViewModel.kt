@@ -30,7 +30,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     private var totalPage = 1
     private var currentKey = "cat"
     private var isNewQuery = true
-    private var isLoading = true
+    private var isLoading = false
 
     // TODO: 下拉到底，继续从网站请求数据
     fun resetQuery() {
