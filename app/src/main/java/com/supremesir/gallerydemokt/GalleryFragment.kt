@@ -45,11 +45,11 @@ class GalleryFragment : Fragment() {
             swipeRefreshLayoutGallery.isRefreshing = false
             galleryAdapter.submitList(it)
         })
-        galleryViewModel.photoListLive.value ?: galleryViewModel.fetchData()
+        galleryViewModel.photoListLive.value ?: galleryViewModel.resetQuery()
 
         swipeRefreshLayoutGallery.setOnRefreshListener {
             Log.d("fetch","下拉刷新，重新请求数据")
-            galleryViewModel.fetchData()
+            galleryViewModel.resetQuery()
         }
 
         recycleView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -60,7 +60,7 @@ class GalleryFragment : Fragment() {
                 val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
                 layoutManager.findLastVisibleItemPositions(intArray)
                 if (intArray[0] == galleryAdapter.itemCount - 1) {
-
+                    galleryViewModel.fetchData()
                 }
 
             }
@@ -94,7 +94,7 @@ class GalleryFragment : Fragment() {
             R.id.refresh -> {
                 swipeRefreshLayoutGallery.isRefreshing = true
                 // 为请求数据延时1s，保证转动效果的出现
-                Handler().postDelayed(Runnable { galleryViewModel.fetchData() }, 1000)
+                Handler().postDelayed(Runnable { galleryViewModel.resetQuery() }, 1000)
 
             }
         }
