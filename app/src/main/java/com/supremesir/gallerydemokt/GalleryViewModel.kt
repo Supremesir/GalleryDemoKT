@@ -70,11 +70,11 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                     // celi(1.1) = 2
                     totalPage = ceil(totalHits.toDouble() / perPage).toInt()
                     if (isNewQuery) {
-                        _photoListLive.value = this.hits.toList()
+                        _photoListLive.value = hits.toList()
                         Log.d("fetch", "重新请求成功")
                     } else {
                         // flatten() 将两个 list 扁平化形成新的一维 list
-                        _photoListLive.value = arrayListOf(_photoListLive.value!!, this.hits.toList()).flatten()
+                        _photoListLive.value = arrayListOf(_photoListLive.value!!, hits.toList()).flatten()
                         Log.d("fetch", "追加请求成功")
                     }
                 }
