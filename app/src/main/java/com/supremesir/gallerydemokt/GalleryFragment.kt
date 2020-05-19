@@ -45,7 +45,6 @@ class GalleryFragment : Fragment() {
             swipeRefreshLayoutGallery.isRefreshing = false
             galleryAdapter.submitList(it)
         })
-        galleryViewModel.photoListLive.value ?: galleryViewModel.resetQuery()
 
         swipeRefreshLayoutGallery.setOnRefreshListener {
             Log.d("fetch","下拉刷新，重新请求数据")

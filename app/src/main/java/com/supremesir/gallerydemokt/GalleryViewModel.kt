@@ -18,6 +18,13 @@ import kotlin.math.ceil
 
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
 
+    companion object {
+        const val  DATA_STATUS_CAN_LOAD_MORE = 0
+        const val DATA_STATUS_NO_MORE = 1
+        const val DATA_STATUS_NETWORK_ERROR = 2
+    }
+
+    private val _dataStatusLive = MutableLiveData<Int>()
     // 通过不可改变的 LiveData 获取 MutableLiveData，实现数据封装
     private val _photoListLive = MutableLiveData<List<PhotoItem>>()
     val photoListLive: LiveData<List<PhotoItem>>
@@ -31,6 +38,10 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     private var currentKey = "cat"
     private var isNewQuery = true
     private var isLoading = false
+
+    init {
+        resetQuery()
+    }
 
     // TODO: 下拉到底，继续从网站请求数据
     fun resetQuery() {
@@ -46,7 +57,10 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
         if (isLoading) return
         isLoading = true
         // 所有的内容已经全部加载, 没有新内容可以加载
-        if (currentPage > totalPage) return
+        if (currentPage > totalPage) {
+            _dataStatusLive.value = DATA_STATUS_NO_MORE
+            return
+        }
         val stringRequest = StringRequest(
             Request.Method.GET,
             getUrl(),
@@ -63,12 +77,14 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
                         Log.d("fetch", "追加请求成功")
                     }
                 }
+                _dataStatusLive.value = DATA_STATUS_CAN_LOAD_MORE
                 isLoading = false
                 isNewQuery = false
                 currentPage++
             },
             Response.ErrorListener {
                 isLoading = true
+                _dataStatusLive.value = DATA_STATUS_NETWORK_ERROR
                 Log.d("fetch", "请求失败，$it")
             }
         ).also {
