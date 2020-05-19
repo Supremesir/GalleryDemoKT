@@ -7,4 +7,6 @@
     <string name="refresh_item">Refresh</string>
     <string name="photo_tag">%d / %d</string>
     <string name="loading_tag">Loading</string>
+    <string name="loaded_tag">Loading Completed</string>
+    <string name="network_error_tag">NetWork Error</string>
 </resources>

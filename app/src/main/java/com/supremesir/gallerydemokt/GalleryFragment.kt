@@ -46,6 +46,15 @@ class GalleryFragment : Fragment() {
             galleryAdapter.submitList(it)
         })
 
+        galleryViewModel.dataStatusLive.observe(requireActivity(), Observer {
+            // 将其值观察到的变化传递给 GalleryAdapter，在 Adapter 中进行试图变化操作
+            galleryAdapter.footerViewStatus = it
+            // 若网络原因，则停止刷新
+            if (it == DATA_STATUS_NETWORK_ERROR) {
+                swipeRefreshLayoutGallery.isRefreshing = false
+            }
+        })
+
         swipeRefreshLayoutGallery.setOnRefreshListener {
             Log.d("fetch","下拉刷新，重新请求数据")
             galleryViewModel.resetQuery()

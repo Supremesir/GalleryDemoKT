@@ -16,15 +16,16 @@ import kotlin.math.ceil
  * @date 2020/4/23 16:41
  */
 
+const val  DATA_STATUS_CAN_LOAD_MORE = 0
+const val DATA_STATUS_NO_MORE = 1
+const val DATA_STATUS_NETWORK_ERROR = 2
+
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
 
-    companion object {
-        const val  DATA_STATUS_CAN_LOAD_MORE = 0
-        const val DATA_STATUS_NO_MORE = 1
-        const val DATA_STATUS_NETWORK_ERROR = 2
-    }
-
     private val _dataStatusLive = MutableLiveData<Int>()
+    val dataStatusLive: LiveData<Int>
+        get() = _dataStatusLive
+
     // 通过不可改变的 LiveData 获取 MutableLiveData，实现数据封装
     private val _photoListLive = MutableLiveData<List<PhotoItem>>()
     val photoListLive: LiveData<List<PhotoItem>>

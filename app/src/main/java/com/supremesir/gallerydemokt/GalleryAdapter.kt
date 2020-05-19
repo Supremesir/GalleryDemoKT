@@ -16,7 +16,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kotlinx.android.synthetic.main.gallery_cell.view.*
-
+import kotlinx.android.synthetic.main.gallery_footer.view.*
 
 /**
  * @author HaoFan Fang
@@ -28,6 +28,8 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
     // 使用 拙劣的 方式存储并传递 图片 高和宽
     var photoHeight: Int = 0
     var photoWidth: Int = 0
+
+    var footerViewStatus = DATA_STATUS_CAN_LOAD_MORE
 
     // 创建一个属于类的常量
     companion object {
@@ -76,7 +78,8 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
                 LayoutInflater.from(parent.context).inflate(R.layout.gallery_footer, parent, false)
                     .also {
                         // 因为之前是2列的布局，将 footer 调整到居中的位置
-                        (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan = true
+                        (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan =
+                            true
                     }
             )
         }
@@ -86,6 +89,23 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
         if (position == itemCount - 1) {
+            with(holder.itemView) {
+                when (footerViewStatus) {
+                    DATA_STATUS_CAN_LOAD_MORE -> {
+                        progressBarLoading.visibility = View.VISIBLE
+                        // 不在 Context 或者 Activity 中获取 string 资源使用 resources.getString(
+                        textViewLoading.text = resources.getString(R.string.loading_tag)
+                    }
+                    DATA_STATUS_NO_MORE -> {
+                        progressBarLoading.visibility = View.GONE
+                        textViewLoading.text = resources.getString(R.string.loaded_tag)
+                    }
+                    DATA_STATUS_NETWORK_ERROR -> {
+                        progressBarLoading.visibility = View.GONE
+                        textViewLoading.text = resources.getString(R.string.network_error_tag)
+                    }
+                }
+            }
             return
         }
         val photoItem = getItem(position)
