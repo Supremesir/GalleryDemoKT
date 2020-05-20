@@ -49,6 +49,8 @@ class GalleryFragment : Fragment() {
         galleryViewModel.dataStatusLive.observe(requireActivity(), Observer {
             // 将其值观察到的变化传递给 GalleryAdapter，在 Adapter 中进行试图变化操作
             galleryAdapter.footerViewStatus = it
+            // 告诉 observer 最后一项需要刷新，实现因为网络变化对 footer 的刷新
+            galleryAdapter.notifyItemChanged(galleryAdapter.itemCount - 1)
             // 若网络原因，则停止刷新
             if (it == DATA_STATUS_NETWORK_ERROR) {
                 swipeRefreshLayoutGallery.isRefreshing = false
