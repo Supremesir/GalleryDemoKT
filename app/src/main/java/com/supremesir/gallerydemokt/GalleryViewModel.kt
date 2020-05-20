@@ -56,12 +56,12 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     // TODO: 根据搜索框接受关键词进行搜索
     fun fetchData() {
         if (isLoading) return
-        isLoading = true
         // 所有的内容已经全部加载, 没有新内容可以加载
         if (currentPage > totalPage) {
             _dataStatusLive.value = DATA_STATUS_NO_MORE
             return
         }
+        isLoading = true
         val stringRequest = StringRequest(
             Request.Method.GET,
             getUrl(),
