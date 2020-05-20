@@ -32,14 +32,17 @@ class GalleryFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setHasOptionsMenu(true)
-        val galleryAdapter = GalleryAdapter()
+
+        galleryViewModel =
+            ViewModelProvider(requireActivity()).get(GalleryViewModel::class.java)
+
+        val galleryAdapter = GalleryAdapter(galleryViewModel)
         recycleView.apply {
             adapter = galleryAdapter
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         }
 
-        galleryViewModel =
-            ViewModelProvider(requireActivity()).get(GalleryViewModel::class.java)
+
         galleryViewModel.photoListLive.observe(requireActivity(), Observer {
             Log.d("fetch","LiveData 更新成功")
             swipeRefreshLayoutGallery.isRefreshing = false

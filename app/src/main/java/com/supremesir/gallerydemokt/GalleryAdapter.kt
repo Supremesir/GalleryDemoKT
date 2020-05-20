@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.gallery_footer.view.*
  * @date 2020/4/23 21:54
  */
 
-class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
+class GalleryAdapter(val galleryViewModel: GalleryViewModel) : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
 
     // 使用 拙劣的 方式存储并传递 图片 高和宽
     var photoHeight: Int = 0
@@ -80,6 +80,12 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
                         // 因为之前是2列的布局，将 footer 调整到居中的位置
                         (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan =
                             true
+                        it.setOnClickListener{ itemView->
+                            itemView.progressBarLoading.visibility = View.VISIBLE
+                            // 不在 Context 或者 Activity 中获取 string 资源使用 resources.getString(
+                            itemView.textViewLoading.text = it.resources.getString(R.string.loading_tag)
+                            galleryViewModel.fetchData()
+                        }
                     }
             )
         }
@@ -95,14 +101,17 @@ class GalleryAdapter : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
                         progressBarLoading.visibility = View.VISIBLE
                         // 不在 Context 或者 Activity 中获取 string 资源使用 resources.getString(
                         textViewLoading.text = resources.getString(R.string.loading_tag)
+                        isClickable = false
                     }
                     DATA_STATUS_NO_MORE -> {
                         progressBarLoading.visibility = View.GONE
                         textViewLoading.text = resources.getString(R.string.loaded_tag)
+                        isClickable = false
                     }
                     DATA_STATUS_NETWORK_ERROR -> {
                         progressBarLoading.visibility = View.GONE
                         textViewLoading.text = resources.getString(R.string.network_error_tag)
+                        isClickable = true
                     }
                 }
             }
