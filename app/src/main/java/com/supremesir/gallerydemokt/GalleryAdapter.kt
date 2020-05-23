@@ -23,7 +23,8 @@ import kotlinx.android.synthetic.main.gallery_footer.view.*
  * @date 2020/4/23 21:54
  */
 
-class GalleryAdapter(val galleryViewModel: GalleryViewModel) : ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
+class GalleryAdapter(private val galleryViewModel: GalleryViewModel) :
+    ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
 
     // 使用 拙劣的 方式存储并传递 图片 高和宽
     var photoHeight: Int = 0
@@ -39,18 +40,16 @@ class GalleryAdapter(val galleryViewModel: GalleryViewModel) : ListAdapter<Photo
 
     object DiffCallback : DiffUtil.ItemCallback<PhotoItem>() {
         override fun areItemsTheSame(oldItem: PhotoItem, newItem: PhotoItem): Boolean {
-            // === 表示判断是否是同一个对象
-            return oldItem === newItem
+            return oldItem.photoId == newItem.photoId
         }
 
         override fun areContentsTheSame(oldItem: PhotoItem, newItem: PhotoItem): Boolean {
-            return oldItem.photoId == newItem.photoId
+            return oldItem == newItem
         }
     }
 
-    override fun getItemId(position: Int): Long {
-        // 因为在底部要添加 footer，所以 +1
-        return super.getItemId(position) + 1
+    override fun getItemCount(): Int {
+        return super.getItemCount() + 1
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -80,10 +79,11 @@ class GalleryAdapter(val galleryViewModel: GalleryViewModel) : ListAdapter<Photo
                         // 因为之前是2列的布局，将 footer 调整到居中的位置
                         (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan =
                             true
-                        it.setOnClickListener{ itemView->
+                        it.setOnClickListener { itemView ->
                             itemView.progressBarLoading.visibility = View.VISIBLE
                             // 不在 Context 或者 Activity 中获取 string 资源使用 resources.getString(
-                            itemView.textViewLoading.text = it.resources.getString(R.string.loading_tag)
+                            itemView.textViewLoading.text =
+                                it.resources.getString(R.string.loading_tag)
                             galleryViewModel.fetchData()
                         }
                     }
@@ -93,7 +93,6 @@ class GalleryAdapter(val galleryViewModel: GalleryViewModel) : ListAdapter<Photo
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-
         if (position == itemCount - 1) {
             with(holder.itemView) {
                 when (footerViewStatus) {
