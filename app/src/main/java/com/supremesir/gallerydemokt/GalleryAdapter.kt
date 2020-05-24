@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -23,23 +24,11 @@ import kotlinx.android.synthetic.main.gallery_footer.view.*
  * @date 2020/4/23 21:54
  */
 
-class GalleryAdapter(private val galleryViewModel: GalleryViewModel) :
-    ListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
-
-    // 使用 拙劣的 方式存储并传递 图片 高和宽
-    var photoHeight: Int = 0
-    var photoWidth: Int = 0
-
-    var footerViewStatus = DATA_STATUS_CAN_LOAD_MORE
-
-    // 创建一个属于类的常量
-    companion object {
-        const val NORMAL_VIEW_TYPE = 0
-        const val FOOTER_VIEW_TYPE = 1
-    }
+class GalleryAdapter : PagedListAdapter<PhotoItem, MyViewHolder>(DiffCallback) {
 
     object DiffCallback : DiffUtil.ItemCallback<PhotoItem>() {
         override fun areItemsTheSame(oldItem: PhotoItem, newItem: PhotoItem): Boolean {
+            // === 表示判断是否是同一个对象
             return oldItem.photoId == newItem.photoId
         }
 
@@ -48,75 +37,25 @@ class GalleryAdapter(private val galleryViewModel: GalleryViewModel) :
         }
     }
 
-    override fun getItemCount(): Int {
-        return super.getItemCount() + 1
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return if (position == itemCount - 1) FOOTER_VIEW_TYPE else NORMAL_VIEW_TYPE
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val holder: MyViewHolder
-        if (viewType == NORMAL_VIEW_TYPE) {
-            holder = MyViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.gallery_cell, parent, false)
-            )
-            holder.itemView.setOnClickListener {
-                Bundle().apply {
-                    putParcelableArrayList("PHOTO_LIST", ArrayList(currentList))
-                    putInt("PHOTO_POSITION", holder.adapterPosition)
-                    putIntArray("PHOTO_SIZE", intArrayOf(photoHeight, photoWidth))
-                    // 此处的 this 代表该 Bundle
-                    holder.itemView.findNavController()
-                        .navigate(R.id.action_galleryFragment_to_pagerPhotoFragment, this)
-                }
+        val holder = MyViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.gallery_cell, parent, false)
+        )
+        holder.itemView.setOnClickListener {
+            Bundle().apply {
+                // 因为在 list 的点击事件里，currentList 不可能为空
+                putParcelableArrayList("PHOTO_LIST", ArrayList(currentList!!))
+                putInt("PHOTO_POSITION", holder.adapterPosition)
+                // 此处的 this 代表该 Bundle
+                holder.itemView.findNavController().navigate(R.id.action_galleryFragment_to_pagerPhotoFragment, this)
             }
-        } else {
-            holder = MyViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.gallery_footer, parent, false)
-                    .also {
-                        // 因为之前是2列的布局，将 footer 调整到居中的位置
-                        (it.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan =
-                            true
-                        it.setOnClickListener { itemView ->
-                            itemView.progressBarLoading.visibility = View.VISIBLE
-                            // 不在 Context 或者 Activity 中获取 string 资源使用 resources.getString(
-                            itemView.textViewLoading.text =
-                                it.resources.getString(R.string.loading_tag)
-                            galleryViewModel.fetchData()
-                        }
-                    }
-            )
         }
         return holder
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        if (position == itemCount - 1) {
-            with(holder.itemView) {
-                when (footerViewStatus) {
-                    DATA_STATUS_CAN_LOAD_MORE -> {
-                        progressBarLoading.visibility = View.VISIBLE
-                        // 不在 Context 或者 Activity 中获取 string 资源使用 resources.getString(
-                        textViewLoading.text = resources.getString(R.string.loading_tag)
-                        isClickable = false
-                    }
-                    DATA_STATUS_NO_MORE -> {
-                        progressBarLoading.visibility = View.GONE
-                        textViewLoading.text = resources.getString(R.string.loaded_tag)
-                        isClickable = false
-                    }
-                    DATA_STATUS_NETWORK_ERROR -> {
-                        progressBarLoading.visibility = View.GONE
-                        textViewLoading.text = resources.getString(R.string.network_error_tag)
-                        isClickable = true
-                    }
-                }
-            }
-            return
-        }
-        val photoItem = getItem(position)
+        // 若 getItem 返回值为空，直接 return
+        val photoItem = getItem(position)?:return
         with(holder.itemView) {
             shimmerLayoutCell.apply {
                 setShimmerColor(0x55FFFFFF)
@@ -126,11 +65,9 @@ class GalleryAdapter(private val galleryViewModel: GalleryViewModel) :
             textViewUser.text = photoItem.photoUser
             textViewLikes.text = photoItem.photoLikes.toString()
             textViewFavorites.text = photoItem.photoFavorites.toString()
-            photoHeight = photoItem.photoHeight
-            photoWidth = photoItem.photoWidth
         }
         Glide.with(holder.itemView)
-            .load(getItem(position).previewUrl)
+            .load(getItem(position)?.previewUrl)
             .placeholder(R.drawable.photo_placeholder)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
@@ -158,6 +95,7 @@ class GalleryAdapter(private val galleryViewModel: GalleryViewModel) :
 
             })
             .into(holder.itemView.imageView)
+
     }
 
 }

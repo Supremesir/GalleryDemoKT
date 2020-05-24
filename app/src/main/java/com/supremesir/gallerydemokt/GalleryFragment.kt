@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.*
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
@@ -19,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_gallery.*
  */
 class GalleryFragment : Fragment() {
 
-    private lateinit var galleryViewModel: GalleryViewModel
+    private val galleryViewModel by viewModels<GalleryViewModel> ()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,52 +34,17 @@ class GalleryFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         setHasOptionsMenu(true)
 
-        galleryViewModel =
-            ViewModelProvider(requireActivity()).get(GalleryViewModel::class.java)
-
-        val galleryAdapter = GalleryAdapter(galleryViewModel)
+        val galleryAdapter = GalleryAdapter()
         recycleView.apply {
             adapter = galleryAdapter
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         }
-
-
-        galleryViewModel.photoListLive.observe(requireActivity(), Observer {
-            Log.d("fetch","LiveData 更新成功")
-            swipeRefreshLayoutGallery.isRefreshing = false
+        galleryViewModel.pagedListLiveData.observe(viewLifecycleOwner, Observer {
             galleryAdapter.submitList(it)
         })
 
-        galleryViewModel.dataStatusLive.observe(requireActivity(), Observer {
-            // 将其值观察到的变化传递给 GalleryAdapter，在 Adapter 中进行试图变化操作
-            galleryAdapter.footerViewStatus = it
-            // 告诉 observer 最后一项需要刷新，实现因为网络变化对 footer 的刷新
-            galleryAdapter.notifyItemChanged(galleryAdapter.itemCount - 1)
-            // 若网络原因，则停止刷新
-            if (it == DATA_STATUS_NETWORK_ERROR) {
-                swipeRefreshLayoutGallery.isRefreshing = false
-            }
-        })
-
-        swipeRefreshLayoutGallery.setOnRefreshListener {
-            Log.d("fetch","下拉刷新，重新请求数据")
-            galleryViewModel.resetQuery()
-        }
-
-        recycleView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy < 0) return
-                val intArray = IntArray(2)
-                val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
-                layoutManager.findLastVisibleItemPositions(intArray)
-                if (intArray[0] == galleryAdapter.itemCount - 1) {
-                    galleryViewModel.fetchData()
-                }
-
-            }
-        })
     }
+
 
     // 加载 Menu 资源
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -107,7 +73,7 @@ class GalleryFragment : Fragment() {
             R.id.refresh -> {
                 swipeRefreshLayoutGallery.isRefreshing = true
                 // 为请求数据延时1s，保证转动效果的出现
-                Handler().postDelayed(Runnable { galleryViewModel.resetQuery() }, 1000)
+//                Handler().postDelayed(Runnable { galleryViewModel.resetQuery() }, 1000)
 
             }
         }
