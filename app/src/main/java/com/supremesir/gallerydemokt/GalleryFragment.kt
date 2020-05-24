@@ -14,13 +14,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.fragment_gallery.*
+import kotlinx.android.synthetic.main.fragment_photo.*
 
 /**
  * A simple [Fragment] subclass.
  */
 class GalleryFragment : Fragment() {
 
-    private val galleryViewModel by viewModels<GalleryViewModel> ()
+    private val galleryViewModel by viewModels<GalleryViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +42,11 @@ class GalleryFragment : Fragment() {
         }
         galleryViewModel.pagedListLiveData.observe(viewLifecycleOwner, Observer {
             galleryAdapter.submitList(it)
+            swipeRefreshLayoutGallery.isRefreshing = false
         })
+        swipeRefreshLayoutGallery.setOnRefreshListener {
+            galleryViewModel.resetQuery()
+        }
 
     }
 
@@ -53,7 +58,7 @@ class GalleryFragment : Fragment() {
         val searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
         searchView.maxWidth = 500
         searchView.setOnQueryTextListener(
-            object : SearchView.OnQueryTextListener{
+            object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     TODO("Not yet implemented")
                 }
@@ -73,7 +78,7 @@ class GalleryFragment : Fragment() {
             R.id.refresh -> {
                 swipeRefreshLayoutGallery.isRefreshing = true
                 // 为请求数据延时1s，保证转动效果的出现
-//                Handler().postDelayed(Runnable { galleryViewModel.resetQuery() }, 1000)
+                Handler().postDelayed({ galleryViewModel.resetQuery() }, 1000)
 
             }
         }
