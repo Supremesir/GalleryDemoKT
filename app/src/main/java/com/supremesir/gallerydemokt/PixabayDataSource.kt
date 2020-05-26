@@ -2,6 +2,8 @@ package com.supremesir.gallerydemokt
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
 import com.android.volley.Request
 import com.android.volley.Response
@@ -13,7 +15,23 @@ import com.google.gson.Gson
  * @date 2020/5/23 16:58
  */
 
+enum class NetworkStatus {
+    LOADING,
+    FAILED,
+    COMPLETED
+}
+
 class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int, PhotoItem>() {
+    //    // 在 Java 中，更推荐使用常量而不是枚举，节约对象的资源开销
+//    // 而在 Kotlin 中，常量也是对象，因此更加推荐使用枚举
+//    companion object {
+//        const val LOADING = 0
+//        const val FAILED = 1
+//        const val COMPLETED = 2
+//    }
+    private val _networkStatus = MutableLiveData<NetworkStatus>()
+    val networkStatus: LiveData<NetworkStatus> = _networkStatus
+
     private val queryKey = arrayOf("cat", "dog", "car", "bee", "phone", "flower", "animal").random()
     override fun loadInitial(
         params: LoadInitialParams<Int>,
@@ -30,7 +48,7 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
             },
             // 错误处理，在分页加载中非常重要
             Response.ErrorListener {
-                Log.d("fetch","paging 初始化加载错误")
+                Log.d("fetch", "paging 初始化加载错误")
             }
         ).also { VolleySingleton.getInstance(context).requestQueue.add(it) }
     }
@@ -46,7 +64,7 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
                 callback.onResult(dataList, params.key + 1)
             },
             Response.ErrorListener {
-                Log.d("fetch","paging 下一页加载错误")
+                Log.d("fetch", "paging 下一页加载错误")
             }
         ).also { VolleySingleton.getInstance(context).requestQueue.add(it) }
     }
