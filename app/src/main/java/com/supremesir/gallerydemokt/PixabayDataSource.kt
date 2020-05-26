@@ -37,6 +37,8 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, PhotoItem>
     ) {
+        // postValue 是线程安全的，无论主线程还是副线程都可以执行
+        _networkStatus.postValue(NetworkStatus.LOADING)
         val url =
             "https://pixabay.com/api/?key=16144591-adae3cf7f07751722a20825cf&q=${queryKey}&per_page=50&page=1"
         StringRequest(
@@ -48,12 +50,14 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
             },
             // 错误处理，在分页加载中非常重要
             Response.ErrorListener {
+                _networkStatus.postValue(NetworkStatus.FAILED)
                 Log.d("fetch", "paging 初始化加载错误")
             }
         ).also { VolleySingleton.getInstance(context).requestQueue.add(it) }
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, PhotoItem>) {
+        _networkStatus.postValue(NetworkStatus.LOADING)
         val url =
             "https://pixabay.com/api/?key=16144591-adae3cf7f07751722a20825cf&q=${queryKey}&per_page=50&page=${params.key}"
         StringRequest(
@@ -64,6 +68,7 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
                 callback.onResult(dataList, params.key + 1)
             },
             Response.ErrorListener {
+                _networkStatus.postValue(NetworkStatus.FAILED)
                 Log.d("fetch", "paging 下一页加载错误")
             }
         ).also { VolleySingleton.getInstance(context).requestQueue.add(it) }
