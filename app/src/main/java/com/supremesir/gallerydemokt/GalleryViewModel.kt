@@ -1,7 +1,9 @@
 package com.supremesir.gallerydemokt
 
 import android.app.Application
+import androidx.arch.core.util.Function
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.Transformations
 import androidx.paging.toLiveData
 
 /**
@@ -10,7 +12,9 @@ import androidx.paging.toLiveData
  */
 
 class GalleryViewModel(application: Application) : AndroidViewModel(application) {
-    val pagedListLiveData = PixabayDataSourceFactory(application).toLiveData(1)
+    private val factory = PixabayDataSourceFactory(application)
+    val pagedListLiveData = factory.toLiveData(1)
+    val networkStatus= Transformations.switchMap(factory.pixabayDataSource) {it.networkStatus}
     fun resetQuery() {
         pagedListLiveData.value?.dataSource?.invalidate()
     }
