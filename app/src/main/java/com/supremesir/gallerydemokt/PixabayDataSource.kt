@@ -77,9 +77,13 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
                 callback.onResult(dataList, params.key + 1)
             },
             Response.ErrorListener {
-                retry = { loadAfter(params, callback)}
-                _networkStatus.postValue(NetworkStatus.FAILED)
-                Log.d("fetch", "paging 下一页加载错误")
+                if (it.toString() == "pagingcom.android.volley.ClientError") {
+                    _networkStatus.postValue(NetworkStatus.COMPLETED)
+                } else {
+                    retry = { loadAfter(params, callback)}
+                    _networkStatus.postValue(NetworkStatus.FAILED)
+                }
+                Log.d("fetch", "paging$it")
             }
         ).also { VolleySingleton.getInstance(context).requestQueue.add(it) }
     }
