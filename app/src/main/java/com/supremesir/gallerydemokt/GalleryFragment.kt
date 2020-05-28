@@ -47,6 +47,9 @@ class GalleryFragment : Fragment() {
         swipeRefreshLayoutGallery.setOnRefreshListener {
             galleryViewModel.resetQuery()
         }
+        galleryViewModel.networkStatus.observe(viewLifecycleOwner, Observer {
+            Log.d("fetch", "$it")
+        })
 
     }
 

@@ -22,7 +22,11 @@ enum class NetworkStatus {
 }
 
 class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int, PhotoItem>() {
-    //    // 在 Java 中，更推荐使用常量而不是枚举，节约对象的资源开销
+    // 用来保存错误现场
+    var retry: (() -> Any)? = null
+
+
+//    // 在 Java 中，更推荐使用常量而不是枚举，节约对象的资源开销
 //    // 而在 Kotlin 中，常量也是对象，因此更加推荐使用枚举
 //    companion object {
 //        const val LOADING = 0
@@ -45,11 +49,15 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
             Request.Method.GET,
             url,
             Response.Listener {
+                // 成功时清除保存的函数，避免误操作
+                retry = null
                 val dataList = Gson().fromJson(it, Pixabay::class.java).hits.toList()
                 callback.onResult(dataList, null, 2)
             },
             // 错误处理，在分页加载中非常重要
             Response.ErrorListener {
+                // 大括号表示保存一个 lambada 函数
+                retry = { loadInitial(params, callback)}
                 _networkStatus.postValue(NetworkStatus.FAILED)
                 Log.d("fetch", "paging 初始化加载错误")
             }
@@ -64,10 +72,12 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
             Request.Method.GET,
             url,
             Response.Listener {
+                retry = null
                 val dataList = Gson().fromJson(it, Pixabay::class.java).hits.toList()
                 callback.onResult(dataList, params.key + 1)
             },
             Response.ErrorListener {
+                retry = { loadAfter(params, callback)}
                 _networkStatus.postValue(NetworkStatus.FAILED)
                 Log.d("fetch", "paging 下一页加载错误")
             }
