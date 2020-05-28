@@ -18,5 +18,9 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     fun resetQuery() {
         pagedListLiveData.value?.dataSource?.invalidate()
     }
+    fun retry() {
+        // invoke() 表明执行
+        factory.pixabayDataSource.value?.retry?.invoke()
+    }
 
 }
