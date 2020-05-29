@@ -84,7 +84,6 @@ freeline/
 freeline_project_description.json
 
 # Android Studio Default
-*.iml
 .gradle
 /local.properties
 /.idea/caches
@@ -96,6 +95,5 @@ freeline_project_description.json
 .DS_Store
 /build
 /captures
-.externalNativeBuild
 .cxxLICENSE
     README.md
