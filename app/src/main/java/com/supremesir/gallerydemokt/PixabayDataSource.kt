@@ -60,7 +60,7 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
                 // 大括号表示保存一个 lambada 函数
                 retry = { loadInitial(params, callback)}
                 _networkStatus.postValue(NetworkStatus.FAILED)
-                Log.d("fetch", "paging 初始化加载错误")
+                Log.d("fetch", "paging 初始化加载错误：$it")
             }
         ).also { VolleySingleton.getInstance(context).requestQueue.add(it) }
     }
@@ -79,13 +79,13 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
                 callback.onResult(dataList, params.key + 1)
             },
             Response.ErrorListener {
-                if (it.toString() == "pagingcom.android.volley.ClientError") {
+                if (it.toString() == "com.android.volley.ClientError") {
                     _networkStatus.postValue(NetworkStatus.COMPLETED)
                 } else {
                     retry = { loadAfter(params, callback)}
                     _networkStatus.postValue(NetworkStatus.FAILED)
                 }
-                Log.d("fetch", "paging$it")
+                Log.d("fetch", "paging 加载下一页错误：$it")
             }
         ).also { VolleySingleton.getInstance(context).requestQueue.add(it) }
     }

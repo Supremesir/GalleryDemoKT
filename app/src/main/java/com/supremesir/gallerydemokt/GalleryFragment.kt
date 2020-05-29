@@ -35,7 +35,7 @@ class GalleryFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         setHasOptionsMenu(true)
 
-        val galleryAdapter = GalleryAdapter()
+        val galleryAdapter = GalleryAdapter(galleryViewModel)
         recycleView.apply {
             adapter = galleryAdapter
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -49,6 +49,8 @@ class GalleryFragment : Fragment() {
         }
         galleryViewModel.networkStatus.observe(viewLifecycleOwner, Observer {
             Log.d("fetch", "$it")
+            // 在 Fragment 里呼叫函数，刷新 NetworkStatus
+            galleryAdapter.updateNetworkStatus(it)
         })
 
     }
