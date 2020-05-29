@@ -86,8 +86,8 @@ class GalleryFragment : Fragment() {
                 // 为请求数据延时1s，保证转动效果的出现
                 Handler().postDelayed({ galleryViewModel.resetQuery() }, 1000)
             }
-            R.id.retry ->
-                galleryViewModel.retry()
+//            R.id.retry ->
+//                galleryViewModel.retry()
         }
         return super.onOptionsItemSelected(item)
     }
