@@ -16,6 +16,7 @@ import com.google.gson.Gson
  */
 
 enum class NetworkStatus {
+    INITIAL_LOADING,
     LOADING,
     FAILED,
     COMPLETED
@@ -44,7 +45,7 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
         // 开始请求时就清除保存的函数，避免误操作
         retry = null
         // postValue 是线程安全的，无论主线程还是副线程都可以执行
-        _networkStatus.postValue(NetworkStatus.LOADING)
+        _networkStatus.postValue(NetworkStatus.INITIAL_LOADING)
         val url =
             "https://pixabay.com/api/?key=16144591-adae3cf7f07751722a20825cf&q=${queryKey}&per_page=50&page=1"
         StringRequest(

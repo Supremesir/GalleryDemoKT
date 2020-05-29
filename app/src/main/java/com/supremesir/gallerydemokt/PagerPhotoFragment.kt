@@ -14,6 +14,8 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.get
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -32,6 +34,9 @@ const val REQUEST_WRITE_EXTERNAL_STORAGE = 1
 
 class PagerPhotoFragment : Fragment() {
 
+    // 将 ViewModel 的范围提升到 Activity 层，两个 Fragment 均可使用
+    val galleryViewModel by activityViewModels<GalleryViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,25 +47,24 @@ class PagerPhotoFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val photoList = arguments?.getParcelableArrayList<PhotoItem>("PHOTO_LIST")
-        PagerPhotoListAdapter().apply {
-            viewPager2.adapter = this
-            submitList(photoList)
-        }
-
-        viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                photoTag.text = getString(R.string.photo_tag, position + 1, photoList?.size)
-            }
-        })
-
-        // 保证 大图加载的是点击的小图，而不是从第一个显示
-        viewPager2.setCurrentItem(arguments?.getInt("PHOTO_POSITION") ?: 0, false)
+        val adapter = PagerPhotoListAdapter()
+        viewPager2.adapter = adapter
+        galleryViewModel.pagedListLiveData.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
+            // 保证 大图加载的是点击的小图，而不是从第一个显示
+            viewPager2.setCurrentItem(arguments?.getInt("PHOTO_POSITION") ?: 0, false)
 //        arguments?.getInt("PHOTO_POSITION")?.let {
 //            // false 关闭平滑滚动的效果
 //            viewPager2.setCurrentItem(it, false)
 //        }
+        })
+
+        viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                photoTag.text = getString(R.string.photo_tag, position + 1, galleryViewModel.pagedListLiveData.value?.size)
+            }
+        })
 
         saveButton.setOnClickListener {
             if (ContextCompat.checkSelfPermission(

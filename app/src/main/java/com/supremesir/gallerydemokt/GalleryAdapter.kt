@@ -43,6 +43,28 @@ class GalleryAdapter(private val galleryViewModel: GalleryViewModel) :
 
     fun updateNetworkStatus(networkStatus: NetworkStatus?) {
         this.networkStatus = networkStatus
+        if (networkStatus == NetworkStatus.INITIAL_LOADING) {
+            hideFooter()
+        } else {
+            showFooter()
+        }
+    }
+
+    private fun hideFooter() {
+        if (hasFooter) {
+            notifyItemRemoved(itemCount - 1)
+        }
+        hasFooter = false
+    }
+
+    private fun showFooter() {
+        // 若此时已经有 Footer 在显示，则刷新 Footer
+        if (hasFooter) {
+            notifyItemChanged(itemCount - 1)
+        } else {
+            hasFooter = true
+            notifyItemInserted(itemCount - 1)
+        }
     }
 
     override fun getItemCount(): Int {
