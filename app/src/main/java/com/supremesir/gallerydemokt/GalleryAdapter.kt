@@ -9,6 +9,7 @@ import androidx.navigation.findNavController
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -169,6 +170,8 @@ class FooterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun newInstance(parent: ViewGroup): FooterViewHolder {
             val view =
                 LayoutInflater.from(parent.context).inflate(R.layout.gallery_footer, parent, false)
+            // 将 footer 占满屏幕宽度
+            (view.layoutParams as StaggeredGridLayoutManager.LayoutParams).isFullSpan = true
             return FooterViewHolder(view)
         }
     }
