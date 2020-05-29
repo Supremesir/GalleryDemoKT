@@ -18,6 +18,7 @@ import com.google.gson.Gson
 enum class NetworkStatus {
     INITIAL_LOADING,
     LOADING,
+    LOADED,
     FAILED,
     COMPLETED
 }
@@ -52,9 +53,9 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
             Request.Method.GET,
             url,
             Response.Listener {
-
                 val dataList = Gson().fromJson(it, Pixabay::class.java).hits.toList()
                 callback.onResult(dataList, null, 2)
+                _networkStatus.postValue(NetworkStatus.LOADED)
             },
             // 错误处理，在分页加载中非常重要
             Response.ErrorListener {
@@ -78,6 +79,7 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
             Response.Listener {
                 val dataList = Gson().fromJson(it, Pixabay::class.java).hits.toList()
                 callback.onResult(dataList, params.key + 1)
+                _networkStatus.postValue(NetworkStatus.LOADED)
             },
             Response.ErrorListener {
                 if (it.toString() == "com.android.volley.ClientError") {

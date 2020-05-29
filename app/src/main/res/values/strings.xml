@@ -8,6 +8,6 @@
     <string name="retry_item">Retry</string>
     <string name="photo_tag">%d / %d</string>
     <string name="loading_tag">Loading</string>
-    <string name="loaded_tag">Loading Completed</string>
+    <string name="completed_tag">Loading Completed</string>
     <string name="network_error_tag">NetWork Error, Click to Reload</string>
 </resources>

@@ -185,7 +185,7 @@ class FooterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                     isClickable = true
                 }
                 NetworkStatus.COMPLETED -> {
-                    textViewLoading.text = resources.getString(R.string.loaded_tag)
+                    textViewLoading.text = resources.getString(R.string.completed_tag)
                     progressBarLoading.visibility = View.GONE
                     isClickable = false
                 }

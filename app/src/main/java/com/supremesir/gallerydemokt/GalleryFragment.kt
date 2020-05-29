@@ -43,7 +43,6 @@ class GalleryFragment : Fragment() {
         }
         galleryViewModel.pagedListLiveData.observe(viewLifecycleOwner, Observer {
             galleryAdapter.submitList(it)
-            swipeRefreshLayoutGallery.isRefreshing = false
         })
         swipeRefreshLayoutGallery.setOnRefreshListener {
             galleryViewModel.resetQuery()
@@ -52,6 +51,7 @@ class GalleryFragment : Fragment() {
             Log.d("fetch", "$it")
             // 在 Fragment 里呼叫函数，刷新 NetworkStatus
             galleryAdapter.updateNetworkStatus(it)
+            swipeRefreshLayoutGallery.isRefreshing = it == NetworkStatus.INITIAL_LOADING
         })
 
     }
