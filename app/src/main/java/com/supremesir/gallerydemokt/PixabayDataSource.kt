@@ -41,6 +41,8 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, PhotoItem>
     ) {
+        // 开始请求时就清除保存的函数，避免误操作
+        retry = null
         // postValue 是线程安全的，无论主线程还是副线程都可以执行
         _networkStatus.postValue(NetworkStatus.LOADING)
         val url =
@@ -49,8 +51,7 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
             Request.Method.GET,
             url,
             Response.Listener {
-                // 成功时清除保存的函数，避免误操作
-                retry = null
+
                 val dataList = Gson().fromJson(it, Pixabay::class.java).hits.toList()
                 callback.onResult(dataList, null, 2)
             },
@@ -65,6 +66,8 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
     }
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, PhotoItem>) {
+        // 开始请求时就清除保存的函数，避免误操作
+        retry = null
         _networkStatus.postValue(NetworkStatus.LOADING)
         val url =
             "https://pixabay.com/api/?key=16144591-adae3cf7f07751722a20825cf&q=${queryKey}&per_page=50&page=${params.key}"
@@ -72,7 +75,6 @@ class PixabayDataSource(private val context: Context) : PageKeyedDataSource<Int,
             Request.Method.GET,
             url,
             Response.Listener {
-                retry = null
                 val dataList = Gson().fromJson(it, Pixabay::class.java).hits.toList()
                 callback.onResult(dataList, params.key + 1)
             },
