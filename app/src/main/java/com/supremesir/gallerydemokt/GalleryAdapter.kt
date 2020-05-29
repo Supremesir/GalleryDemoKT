@@ -26,6 +26,12 @@ import kotlinx.android.synthetic.main.gallery_footer.view.*
 class GalleryAdapter(private val galleryViewModel: GalleryViewModel) :
     PagedListAdapter<PhotoItem, RecyclerView.ViewHolder>(DiffCallback) {
 
+    // 当重新进入 GalleryFragment 后，尝试重新加载
+    // 解决，网络错误时，在进入 PagerPhotoFragment 后恢复网络后回到 GalleryFragment 后，不会重新加载的问题
+    init {
+        galleryViewModel.retry()
+    }
+
     private var networkStatus: NetworkStatus? = null
 
     // 管理 footer 显示，实现第一次加载时不显示 footer
