@@ -60,13 +60,13 @@ class GalleryFragment : Fragment() {
         searchView.setOnQueryTextListener(
             object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    TODO("Not yet implemented")
+                    val queryKey = query
+                    TODO("根据用户输入，实现自定义关键词搜索")
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
                     TODO("Not yet implemented")
                 }
-
             }
         )
 
