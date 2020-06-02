@@ -89,6 +89,9 @@ class GalleryAdapter(private val galleryViewModel: GalleryViewModel) :
                     holder.itemView.setOnClickListener {
                         Bundle().apply {
                             putInt("PHOTO_POSITION", holder.adapterPosition)
+                            getItem(holder.adapterPosition).also {
+                                putIntArray("PHOTO_SIZE", intArrayOf(it!!.photoHeight, it.photoWidth))
+                            }
                             // 此处的 this 代表该 Bundle
                             holder.itemView.findNavController()
                                 .navigate(R.id.action_galleryFragment_to_pagerPhotoFragment, this)
